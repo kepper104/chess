@@ -3,9 +3,7 @@ BLACK = 2
 
 
 class Piece():
-    def __init__(self, row, col, color):
-        self.row = row
-        self.col = col
+    def __init__(self, color):
         self.color = color
 
     def set_position(self, row, col):
@@ -18,7 +16,7 @@ class Piece():
     def get_color(self):
         return self.color
 
-    def can_move(self):
+    def can_move(self, board, row, col, row1, col1):
         return False
 
     def is_out_of_bounds(self, row, col):
@@ -26,16 +24,27 @@ class Piece():
             return False
         return True
 
+    def in_its_position(self, row, col, row1, col1):
+        if row == row1 and col == col1:
+            return True
+        return False
+
+    def can_attack(self, board, row, col, row1, col1):
+        return self.can_move(board, row, col, row1, col1)
+
 
 class Pawn(Piece):
     def char(self):
         return 'P'
 
-    def can_move(self, row, col):
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
         # Пешка может ходить только по вертикали
         # "взятие на проходе" не реализовано
-        if self.col != col:
+        if col != col1:
             return False
+
         # Пешка может сделать из начального положения ход на 2 клетки
         # вперёд, поэтому поместим индекс начального ряда в start_row.
         if self.color == WHITE:
@@ -46,33 +55,56 @@ class Pawn(Piece):
             start_row = 6
 
         # ход на 1 клетку
-        if self.row + direction == row:
+        if row + direction == row1:
             return True
 
         # ход на 2 клетки из начального положения
-        if self.row == start_row and self.row + 2 * direction == row:
+        if (row == start_row
+                and row + 2 * direction == row1
+                and board.field[row + direction][col] is None):
             return True
-
         return False
+
+    def can_attack(self, board, row, col, row1, col1):
+        direction = 1 if (self.color == WHITE) else -1
+        return (row + direction == row1
+                and (col + 1 == col1 or col - 1 == col1))
 
 
 class Rook(Piece):
     def char(self):
         return 'R'
 
-    def can_move(self, row, col):
-        if self.row == row or self.col == col:
-            return True
-        return False
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
+
+        if row != row1 and col != col1:
+            return False
+
+        step = 1 if (row1 >= row) else -1
+        for r in range(row + step, row1, step):
+            # Если на пути по вертикали есть фигура
+            if not (board.get_piece(r, col) is None):
+                return False
+
+        step = 1 if (col1 >= col) else -1
+        for c in range(col + step, col1, step):
+            # Если на пути по горизонтали есть фигура
+            if not (board.get_piece(row, c) is None):
+                return False
+        return True
 
 
 class Knight(Piece):
     def char(self):
         return "N"
 
-    def can_move(self, row, col):
-        r1 = abs(self.row - row)
-        r2 = abs(self.col - col)
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
+        r1 = abs(row - row1)
+        r2 = abs(col - col1)
         can = r1 == 1 and r2 == 2 or r1 == 2 and r2 == 1
         if can and not self.is_out_of_bounds(row, col):
             return True
@@ -83,8 +115,10 @@ class Bishop(Piece):
     def char(self):
         return "B"
 
-    def can_move(self, row, col):
-        if (abs(self.row - row) == abs(self.col - col)) and not self.is_out_of_bounds(row, col):
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
+        if (abs(row - row1) == abs(col - col1)) and not self.is_out_of_bounds(row, col):
             return True
         return False
 
@@ -93,10 +127,24 @@ class Queen(Piece):
     def char(self):
         return "Q"
 
-    def can_move(self, row, col):
-        can = self.col == col or self.row == row or abs(
-            self.row - row) == abs(self.col - col)
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
+        can = col == col1 or row == row1 or abs(
+            row - row1) == abs(col - col1)
 
         if can and not self.is_out_of_bounds(row, col):
+            return True
+        return False
+
+
+class King(Piece):
+    def char(self):
+        return "K"
+
+    def can_move(self, board, row, col, row1, col1):
+        if self.in_its_position(row, col, row1, col1):
+            return False
+        if abs(row - row1) <= 1 and abs(col - col1) <= 1:
             return True
         return False

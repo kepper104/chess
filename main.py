@@ -9,9 +9,25 @@ class Board:
         self.field = []
         for row in range(8):
             self.field.append([None] * 8)
-        # Пешка белого цвета в клетке E2.
-        # self.field[1][4] = Pawn(1, 4, WHITE)
-        # self.field[2][5] = Rook(2, 5, BLACK)
+
+        # Default placement
+
+        # self.field[0] = [
+        #     Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
+        #     King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
+        # ]
+        # self.field[1] = [
+        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
+        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
+        # ]
+        # self.field[6] = [
+        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
+        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
+        # ]
+        # self.field[7] = [
+        #     Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+        #     King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
+        # ]
 
     def current_player_color(self):
         return self.color
@@ -39,15 +55,26 @@ class Board:
         piece = self.field[row][col]
         if piece is None:
             return False
-        if piece.get_color() != self.color:
+        if piece.get_color() != self.color:  # Ходит не тот человек/фигурой не того цвета
             return False
-        if not piece.can_move(row1, col1):
+        if self.field[row1][col1] is None:
+            if not piece.can_move(self, row, col, row1, col1):
+                return False
+        elif self.field[row1][col1].get_color() == opponent(piece.get_color()):
+            if not piece.can_attack(self, row, col, row1, col1):
+                return False
+        else:
             return False
         self.field[row][col] = None  # Снять фигуру.
         self.field[row1][col1] = piece  # Поставить на новое место.
         piece.set_position(row1, col1)
         self.color = opponent(self.color)
         return True
+
+    def get_piece(self, row, col):
+        if correct_coords(row, col):
+            return self.field[row][col]
+        return None
 
 
 def correct_coords(row, col):
@@ -62,7 +89,7 @@ def opponent(color):
     return WHITE
 
 
-def print_board(board):
+def print_board(board):  # Распечатать доску в текстовом виде (см. скриншот)
     print('     +----+----+----+----+----+----+----+----+')
     for row in range(7, -1, -1):
         print(' ', row, end='  ')
@@ -105,4 +132,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    pass
