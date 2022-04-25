@@ -1,3 +1,7 @@
 *.pyc
 chess-env
 __pycache__
+test_unittests.py
+.vscode
+.gitignore
+tests.py

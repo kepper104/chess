@@ -6,10 +6,6 @@ class Piece():
     def __init__(self, color):
         self.color = color
 
-    def set_position(self, row, col):
-        self.row = row
-        self.col = col
-
     def char(self):
         return None
 
@@ -93,6 +89,9 @@ class Rook(Piece):
             # Если на пути по горизонтали есть фигура
             if not (board.get_piece(row, c) is None):
                 return False
+
+        if not (board.get_piece(row1, col1) is None):
+            return False
         return True
 
 
@@ -132,10 +131,43 @@ class Queen(Piece):
             return False
         can = col == col1 or row == row1 or abs(
             row - row1) == abs(col - col1)
+        if not can or self.is_out_of_bounds(row1, col1):
+            return False
 
-        if can and not self.is_out_of_bounds(row, col):
-            return True
-        return False
+        piece_dest = board.get_piece(row1, col1)
+        if not piece_dest is None:
+            if piece_dest.get_color() == self.get_color():
+                return False
+
+        if col1 == col:
+            step = 1 if (row1 >= row) else -1
+            for r in range(row + step, row1, step):
+                # Если на пути по вертикали есть фигура
+                mb_piece = board.get_piece(r, col)
+                if not (mb_piece is None):
+                    return False
+
+        elif row1 == row:
+            step = 1 if (col1 >= col) else -1
+            for c in range(col + step, col1, step):
+                # Если на пути по горизонтали есть фигура
+                mb_piece = board.get_piece(row, c)
+                if not (mb_piece is None):
+                    return False
+        else:
+            step_row = 1 if (row1 >= row) else -1
+            step_col = 1 if (col1 >= col) else -1
+            cur_row, cur_col = row, col
+            for i in range(abs(row1 - row)):
+                cur_row += step_row
+                cur_col += step_col
+                mb_piece = board.get_piece(cur_row, cur_col)
+                if not (mb_piece is None):
+                    same = row1 == cur_row and col1 == cur_col
+                    if mb_piece.get_color() != self.get_color() and same:
+                        return True
+                    return False
+        return True
 
 
 class King(Piece):

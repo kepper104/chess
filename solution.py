@@ -1,9 +1,17 @@
 from pieces import *
 WHITE = 1
 BLACK = 2
+FIGURES = {
+    "Q": Queen,
+    "R": Rook,
+    "N": Knight,
+    "B": Bishop,
+    "K": King
+}
 
 
 class Board:
+
     def __init__(self):
         self.color = WHITE
         self.field = []
@@ -43,7 +51,7 @@ class Board:
         c = 'w' if color == WHITE else 'b'
         return c + piece.char()
 
-    def move_piece(self, row, col, row1, col1):
+    def move_piece(self, row, col, row1, col1, move=True):
         """Переместить фигуру из точки (row, col) в точку (row1, col1).
         Если перемещение возможно, метод выполнит его и вернет True.
         Если нет --- вернет False"""
@@ -65,16 +73,27 @@ class Board:
                 return False
         else:
             return False
-        self.field[row][col] = None  # Снять фигуру.
-        self.field[row1][col1] = piece  # Поставить на новое место.
-        piece.set_position(row1, col1)
-        self.color = opponent(self.color)
+        if move:
+            self.field[row][col] = None  # Снять фигуру.
+            self.field[row1][col1] = piece  # Поставить на новое место.
+            self.color = opponent(self.color)
         return True
 
     def get_piece(self, row, col):
         if correct_coords(row, col):
             return self.field[row][col]
         return None
+
+    def move_and_promote_pawn(self, row, col, row1, col1, char):
+        piece = self.field[row][col]
+        if piece.char() != "P":
+            return False
+        if not self.move_piece(row, col, row1, col1, move=False):
+            return False
+        self.field[row][col] = None
+        self.field[row1][col1] = FIGURES[char](piece.get_color())
+        self.color = opponent(self.color)
+        return True
 
 
 def correct_coords(row, col):
