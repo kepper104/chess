@@ -1,2 +1,3 @@
-
 *.pyc
+chess-env
+__pycache__
