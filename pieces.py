@@ -3,8 +3,9 @@ BLACK = 2
 
 
 class Piece():
-    def __init__(self, color):
+    def __init__(self, color, moved=False):
         self.color = color
+        self.moved = False
 
     def char(self):
         return None
@@ -135,7 +136,7 @@ class Queen(Piece):
             return False
 
         piece_dest = board.get_piece(row1, col1)
-        if not piece_dest is None:
+        if not (piece_dest is None):
             if piece_dest.get_color() == self.get_color():
                 return False
 

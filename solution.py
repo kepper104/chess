@@ -75,6 +75,7 @@ class Board:
             return False
         if move:
             self.field[row][col] = None  # Снять фигуру.
+            piece.moved = True
             self.field[row1][col1] = piece  # Поставить на новое место.
             self.color = opponent(self.color)
         return True
@@ -93,6 +94,70 @@ class Board:
         self.field[row][col] = None
         self.field[row1][col1] = FIGURES[char](piece.get_color())
         self.color = opponent(self.color)
+        return True
+
+    def castling0(self):
+        """Длинная рокировка (C левой ладьи)"""
+        # Определение строки по цвету
+        row = 7 if self.color == BLACK else 0
+
+        # Провека отсутствия фигур между
+        figs_beetween = [self.field[row][1], self.field[row]
+                         [2], self.field[row][3]]
+        if any(figs_beetween):
+            return False
+        # Проверка того, что фигуры, которыми играют это ладья и король
+        if not isinstance(self.field[row][0], Rook) or not isinstance(self.field[row][4], King):
+            return False
+
+        # Проверка того, что никакие фигуры не двигались
+        action_figs = [self.field[row][0].moved, self.field[row]
+                       [4].moved]
+
+        if any(action_figs):
+            return False
+
+        self.field[row][0] = None  # Снимаем ладью
+        self.field[row][3] = Rook(self.color, True)  # Ставим ладью
+
+        self.field[row][4] = None  # Снимаем короля
+        self.field[row][2] = King(self.color, True)  # Ставим короля
+
+        self.color = opponent(self.color)  # Меняем цвет
+
+        return True
+
+    def castling7(self):
+        """Короткая рокировка (C правой ладьи)"""
+        # Определение строки по цвету
+        row = 7 if self.color == BLACK else 0
+
+        # Провека отсутствия фигур между
+        figs_beetween = [self.field[row][5], self.field[row]
+                         [6]]
+
+        if any(figs_beetween):
+            return False
+
+        # Проверка того, что фигуры, которыми играют это ладья и король
+        if not isinstance(self.field[row][7], Rook) or not isinstance(self.field[row][4], King):
+            return False
+
+        # Проверка того, что никакие фигуры не двигались
+        action_figs = [self.field[row][7].moved, self.field[row]
+                       [4].moved]
+
+        if any(action_figs):
+            return False
+
+        self.field[row][7] = None  # Снимаем ладью
+        self.field[row][5] = Rook(self.color, True)  # Ставим ладью
+
+        self.field[row][4] = None  # Снимаем короля
+        self.field[row][6] = King(self.color, True)  # Ставим короля
+
+        self.color = opponent(self.color)  # Меняем цвет
+
         return True
 
 
