@@ -18,26 +18,27 @@ class Board:
         for row in range(8):
             self.field.append([None] * 8)
 
-        # Default placement
+        # Стандартная расстановка фигур
 
-        # self.field[0] = [
-        #     Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
-        #     King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
-        # ]
-        # self.field[1] = [
-        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
-        #     Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
-        # ]
-        # self.field[6] = [
-        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
-        #     Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
-        # ]
-        # self.field[7] = [
-        #     Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
-        #     King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
-        # ]
+        self.field[0] = [
+            Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
+            King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
+        ]
+        self.field[1] = [
+            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
+            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
+        ]
+        self.field[6] = [
+            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
+            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
+        ]
+        self.field[7] = [
+            Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+            King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
+        ]
 
     def current_player_color(self):
+        """Получить цвет игрока, который сейчас ходит"""
         return self.color
 
     def cell(self, row, col):
@@ -81,19 +82,27 @@ class Board:
         return True
 
     def get_piece(self, row, col):
+        """Получить фигуру в клетке row, col. Аналог field[row][col], но проверяет правильность координат"""
         if correct_coords(row, col):
             return self.field[row][col]
         return None
 
     def move_and_promote_pawn(self, row, col, row1, col1, char):
+        """Возвышение пешки, получает начальные и конечные координаты, 
+        символ фигуры, в которую конвертируется пешка """
+        # Получаем фигуру
         piece = self.field[row][col]
+        # Проверяем что это пешка
         if piece.char() != "P":
             return False
+        # Проверяем что она может походить на крайний ряд
         if not self.move_piece(row, col, row1, col1, move=False):
             return False
-        self.field[row][col] = None
+
+        self.field[row][col] = None  # Снимаем пешку
+        # Ставим новую фигуру выбранного знака
         self.field[row1][col1] = FIGURES[char](piece.get_color())
-        self.color = opponent(self.color)
+        self.color = opponent(self.color)  # Меняем цвет
         return True
 
     def castling0(self):
@@ -168,12 +177,14 @@ def correct_coords(row, col):
 
 
 def opponent(color):
+    """Возвращает цвет, противоположный введенному"""
     if color == WHITE:
         return BLACK
     return WHITE
 
 
-def print_board(board):  # Распечатать доску в текстовом виде (см. скриншот)
+def print_board(board):
+    """Красиво выводит доску со всеми фигурами"""
     print('     +----+----+----+----+----+----+----+----+')
     for row in range(7, -1, -1):
         print(' ', row, end='  ')
@@ -207,14 +218,16 @@ def main():
         command = input()
         if command == 'exit':
             break
-        move_type, row, col, row1, col1 = command.split()
+        command, row, col, row1, col1 = command.split()
         row, col, row1, col1 = int(row), int(col), int(row1), int(col1)
-        if board.move_piece(row, col, row1, col1):
-            print('Ход успешен')
-        else:
-            print('Координаты некорректы! Попробуйте другой ход!')
+
+        if command == "move":
+            move_result = board.move_piece(row, col, row1, col1)
+            if move_result:
+                print('Ход успешен')
+            else:
+                print('Координаты некорректы! Попробуйте другой ход!')
 
 
 if __name__ == '__main__':
-    # main()
-    pass
+    main()
