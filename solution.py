@@ -12,30 +12,40 @@ FIGURES = {
 
 class Board:
 
-    def __init__(self):
+    def __init__(self, std=True):
         self.color = WHITE
         self.field = []
         for row in range(8):
             self.field.append([None] * 8)
 
         # Стандартная расстановка фигур
+        if std:
+            self.field[0] = [
+                Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
+                King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
+            ]
+            self.field[1] = [
+                Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
+                Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
+            ]
+            self.field[6] = [
+                Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
+                Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
+            ]
+            self.field[7] = [
+                Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+                King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
+            ]
+        else:
+            self.field[0] = [
+                Rook(WHITE), None, None, None,
+                King(WHITE), None, None, Rook(WHITE)
+            ]
 
-        self.field[0] = [
-            Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE),
-            King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)
-        ]
-        self.field[1] = [
-            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE),
-            Pawn(WHITE), Pawn(WHITE), Pawn(WHITE), Pawn(WHITE)
-        ]
-        self.field[6] = [
-            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK),
-            Pawn(BLACK), Pawn(BLACK), Pawn(BLACK), Pawn(BLACK)
-        ]
-        self.field[7] = [
-            Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
-            King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
-        ]
+            self.field[7] = [
+                Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK),
+                King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)
+            ]
 
     def current_player_color(self):
         """Получить цвет игрока, который сейчас ходит"""
@@ -149,7 +159,10 @@ class Board:
             return False
 
         # Проверка того, что фигуры, которыми играют это ладья и король
-        if not isinstance(self.field[row][7], Rook) or not isinstance(self.field[row][4], King):
+        is_rook = isinstance(self.field[row][7], Rook)
+        is_king = isinstance(self.field[row][7], Rook)
+
+        if not is_rook or not isinstance(self.field[row][4], King):
             return False
 
         # Проверка того, что никакие фигуры не двигались

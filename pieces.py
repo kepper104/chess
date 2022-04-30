@@ -2,14 +2,14 @@ WHITE = 1
 BLACK = 2
 
 
-def is_out_of_bounds(self, row, col):
+def is_out_of_bounds(row, col):
     """Провека валидности координат"""
     if 0 <= row <= 7 and 0 <= col <= 7:
         return False
     return True
 
 
-def in_its_position(self, row, col, row1, col1):
+def in_its_position(row, col, row1, col1):
     """Проверка, находится ли желаемая позиция фигуры в текущей"""
     if row == row1 and col == col1:
         return True
