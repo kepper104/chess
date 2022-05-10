@@ -7,7 +7,7 @@ from colorama import init
 
 def main():
     # Создаём шахматную доску
-    board = Board(std=False)
+    board = Board()
     # Цикл ввода команд игроков
     while True:
         # Выводим положение фигур на доске
@@ -33,7 +33,7 @@ def main():
         if not command:
             print("Вы ввели ничего, попробуйте еще раз.")
             continue
-        
+
         if command[0] == 'exit':
             print("Выхожу")
             break
@@ -50,9 +50,13 @@ def main():
                 else:
                     print("Что-то пошло не так! Попробуйте еще раз")
             elif command[0] == "promote":
+
                 col = int(command[2])
-                fig = int(command[4])
-                promote_result = board.move_and_promote_pawn(row, col, row1, col1)
+                row1, col1 = int(command[3]), int(command[4])
+                fig = command[5]
+                print(row, col, row1, col1)
+                promote_result = board.move_and_promote_pawn(
+                    row, col, row1, col1, fig.lower()[0])
                 if promote_result:
                     print("Ход и превращение успешно")
                 else:
